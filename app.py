@@ -1,13 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+import streamlit as st
 from gurobipy import Model, GRB, quicksum
 import numpy as np
 import os
 
+# Set path to your Gurobi license file
 os.environ['GRB_LICENSE_FILE'] = r'gurobi\gurobi.lic'
-
-
-app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Replace with a strong secret key
 
 def solve_sudoku(grid):
     model = Model("Sudoku")
@@ -56,37 +53,43 @@ def solve_sudoku(grid):
                 for k in range(9):
                     if x[i, j, k].x > 0.5:
                         solution[i][j] = k + 1
-        return solution.tolist()  # Convert to list for JSON/templating compatibility
+        return solution.tolist()  # Convert to list for Streamlit display
     else:
         return None
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        # Build the grid from the submitted form data.
-        grid = []
-        try:
-            for i in range(9):
-                # Expecting numbers separated by spaces; empty cells can be left blank or as 0
-                row_str = request.form.get(f"row{i}", "")
-                # Convert each row into a list of integers (0 represents an empty cell)
-                row = [int(num) if num.strip() != "" else 0 for num in row_str.split()]
-                if len(row) != 9:
-                    flash("Each row must contain 9 numbers separated by spaces.")
-                    return redirect(url_for("index"))
-                grid.append(row)
-        except Exception as e:
-            flash("Invalid input detected. Please enter valid numbers.")
-            return redirect(url_for("index"))
-        
-        solution = solve_sudoku(grid)
-        if solution is None:
-            flash("No solution found. Please check your input puzzle.")
-            return redirect(url_for("index"))
-        else:
-            return render_template("index.html", grid=grid, solution=solution)
-    # GET request: show the form
-    return render_template("index.html", grid=None, solution=None)
+# --- Streamlit Interface ---
 
-if __name__ == "__main__":
-    app()
+st.title("Sudoku Solver using Gurobi and Streamlit")
+st.write(
+    "Enter your Sudoku puzzle below. Each row should contain 9 numbers separated by spaces. "
+    "Use 0 or leave blank for empty cells."
+)
+
+# Create text input for each row
+row_inputs = []
+for i in range(9):
+    row_input = st.text_input(f"Row {i+1}", value="")
+    row_inputs.append(row_input)
+
+if st.button("Solve Sudoku"):
+    try:
+        puzzle = []
+        for row_str in row_inputs:
+            # Convert each row string to a list of integers
+            row = [int(num) if num.strip() != "" else 0 for num in row_str.split()]
+            if len(row) != 9:
+                st.error("Each row must contain exactly 9 numbers separated by spaces.")
+                st.stop()
+            puzzle.append(row)
+        # Call the solver
+        solution = solve_sudoku(puzzle)
+        if solution is None:
+            st.error("No solution found. Please check your input puzzle.")
+        else:
+            st.success("Sudoku solved!")
+            st.subheader("Input Puzzle")
+            st.table(puzzle)
+            st.subheader("Solution")
+            st.table(solution)
+    except Exception as e:
+        st.error("Invalid input detected. Please enter valid numbers.")
