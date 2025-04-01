@@ -72,24 +72,22 @@ for i in range(9):
     row_inputs.append(row_input)
 
 if st.button("Solve Sudoku"):
-    try:
-        puzzle = []
-        for row_str in row_inputs:
-            # Convert each row string to a list of integers
-            row = [int(num) if num.strip() != "" else 0 for num in row_str.split()]
-            if len(row) != 9:
-                st.error("Each row must contain exactly 9 numbers separated by spaces.")
-                st.stop()
-            puzzle.append(row)
-        # Call the solver
-        solution = solve_sudoku(puzzle)
-        if solution is None:
-            st.error("No solution found. Please check your input puzzle.")
-        else:
-            st.success("Sudoku solved!")
-            st.subheader("Input Puzzle")
-            st.table(puzzle)
-            st.subheader("Solution")
-            st.table(solution)
-    except Exception as e:
-        st.error("Invalid input detected. Please enter valid numbers.")
+
+    puzzle = []
+    for row_str in row_inputs:
+        # Convert each row string to a list of integers
+        row = [int(num) if num.strip() != "" else 0 for num in row_str.split()]
+        if len(row) != 9:
+            st.error("Each row must contain exactly 9 numbers separated by spaces.")
+            st.stop()
+        puzzle.append(row)
+    # Call the solver
+    solution = solve_sudoku(puzzle)
+    if solution is None:
+        st.error("No solution found. Please check your input puzzle.")
+    else:
+        st.success("Sudoku solved!")
+        st.subheader("Input Puzzle")
+        st.table(puzzle)
+        st.subheader("Solution")
+        st.table(solution)
