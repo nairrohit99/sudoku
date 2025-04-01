@@ -89,4 +89,4 @@ def index():
     return render_template("index.html", grid=None, solution=None)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app()
