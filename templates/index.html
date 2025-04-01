@@ -1,1 +1,57 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sudoku Solver</title>
+    <style>
+        table { border-collapse: collapse; margin-bottom: 20px; }
+        td { border: 1px solid #333; width: 30px; height: 30px; text-align: center; }
+        input[type="text"] { width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Sudoku Solver</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+         <ul style="color: red;">
+         {% for message in messages %}
+            <li>{{ message }}</li>
+         {% endfor %}
+         </ul>
+      {% endif %}
+    {% endwith %}
+    
+    {% if grid and solution %}
+        <h2>Input Puzzle</h2>
+        <table>
+        {% for row in grid %}
+            <tr>
+            {% for num in row %}
+                <td>{{ num if num != 0 else '' }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+        <h2>Solved Puzzle</h2>
+        <table>
+        {% for row in solution %}
+            <tr>
+            {% for num in row %}
+                <td>{{ num }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+        <a href="{{ url_for('index') }}">Solve another puzzle</a>
+    {% else %}
+        <p>Enter your Sudoku puzzle below. Each row should contain 9 numbers separated by spaces. Use 0 or leave blank for empty cells.</p>
+        <form method="post" action="{{ url_for('index') }}">
+            {% for i in range(9) %}
+                <label for="row{{ i }}">Row {{ i+1 }}:</label><br>
+                <input type="text" name="row{{ i }}" id="row{{ i }}"><br><br>
+            {% endfor %}
+            <input type="submit" value="Solve">
+        </form>
+    {% endif %}
+</body>
+</html>
