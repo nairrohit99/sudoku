@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from gurobipy import Model, GRB, quicksum
 import numpy as np
+import os
+
+os.environ['GRB_LICENSE_FILE'] = r'gurobi\gurobi.lic'
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Replace with a strong secret key
